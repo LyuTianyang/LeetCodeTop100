@@ -1,0 +1,285 @@
+/usr/bin/mysqladmin -u root password 'new-password'
+/usr/bin/mysqladmin -u root password root
+/usr/bin/mysqladmin -u root -h localhost.localdomain password 'new-password'
+
+datadir=/var/lib/mysql --pid-file=/var/lib/mysql/localhost.localdomain.pid
+
+创建tb表语句
+create table tb(id int(4) auto_increment, name varchar(5), dept varchar(5), primary key(id))ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+
+主键索引(不能是null)
+
+单值索引
+create index dept_index on tb(dept);
+唯一索引 (可以是null)
+create unique index name_index on tb(name);
+复合索引
+create index dept_name_index on tb(dept,name);
+
+
+单值索引
+alter table tb add index dept_index on tb(dept);
+唯一索引
+alter table tb add unique index name_index(name);
+复合索引
+alter table tb add index dept_name_index(dept,name);
+
+删除索引
+drop index 索引名 on 表名;
+drop index name_index on tb;
+
+查询索引
+show index from tb;
+
+create table course(cid int(3), cname varchar(20), tid int(3) );
+create table teacher(tid int(3), tname varchar(20), tcid int(3) );
+create table teacherCard( tcid int(3), tcdesc varchar(200) );
+
+
+insert into course values(1, 'java', 1);
+insert into course values(2, 'html', 1);
+insert into course values(3, 'sql', 2);
+insert into course values(4, 'web', 3);
+
+insert into teacher values(1, 'tz', 1);
+insert into teacher values(2, 'tw', 2);
+insert into teacher values(3, 'tl', 3);
+
+insert into teacherCard values(1, 'tzdesc');
+insert into teacherCard values(2, 'twdesc');
+insert into teacherCard values(3, 'tldesc');
+
+1)数据量小的表，优先查询
+explain select * from teacher t, course c, teacherCard tc
+where t.tid = c.tid and t.tcid = tc.tcid
+and (c.cid = 2 or tc.tcid = 3);
+
+
+id值不同时，id值越大越优先查询
+将多表查询，转为子查询
+explain select tc.tcdesc from teacherCard tc, course c, teacher t where c.tid = t.tid and t.tcid = tc.tcid and c.cname = 'sql'
+
+explain select tc.tcdesc from teacherCard tc where tc.tcid = (select t.tcid from teacher t where t.tid = (select c.tid from course c where c.cname = 'sql'));
+
+id值有相同有不同，id值越大越优先；id相同，从上往下顺序执行
+explain select t.tname, tc.tcdesc from teacher t, teacherCard tc where t.tcid = tc.tcid and t.tid = (select c.tid from course c  where c.cname = 'sql');
+
+2)查询类型
+primary: 包含子查询的SQL中，最外层
+subquery: 包含子查询的SQL中，非最外层
+simple简单查询：不包含子查询和union
+derived衍生查询
+explain select cr.cname from (select * from course where tid in (1,2)) cr;
+
+3)type：索引类型
+ system>const>eq_ref>ref>range>index>all 对索引类型优化的前提：一定要有索引
+其中: system, const只是理想情况(只查到一条数据)；实际能达到 ref或range
+
+system, const 只查到一条数据
+eq_ref 唯一性索引 每条数据有且只有一条（不能多也不能是0）
+
+ref： 非唯一性索引，对于每个索引键，返回匹配的所有行(0, 多)
+alter table teacher add index index_name (tname);
+explain select * from teacher where tname = 'tz'
+
+range：检索指定范围的行，where后面是范围查询 (between, in ,> ,<) in有时候会失效转为无索引(all
+alter table teacher add index tid_index (tid);
+explain select t.* from teacher t where t.tid in (1,2) ;
+alter table teacher add index uk_tcid (tcid);
+
+index: 查询全部索引中数据
+explain select tid from teacher; --tid就是索引
+
+all：查询表中全部数据
+explain select cid from course; --cid不是索引
+
+4)possible_keys 预测使用到的索引，有时是不准的
+
+5)key 实际使用到的索引
+
+6)key_len 索引的长度
+
+7) ref：于type中的ref有区别。指明当前表所参照的字段
+
+8) rows: 被索引优化查询的数据个数
+
+9) Extra:
+
+using filesort: 性能消耗大; 需要 “额外”的一次排序
+对于单索引，如果排序和查找的是同一个字段，则不会出现using filesort。不同字段则会出现using filesort
+建议：where哪些字段就order by哪些字段
+
+对于复合索引：where和order by不要跨列也不要无序使用
+
+using index: 性能提升，覆盖索引
+
+using where: 需要回表查询
+假设age是索引列
+语句是 select age, name from table where age = 30 此语句必须回原表查询name
+
+impossible where: where 子句永远为false
+select * from table where a1 = 'x' and a1 = 'y';
+
+SQL优化主要就是优化索引
+
+编写过程：
+select distinct .. from .. join .. on .. where .. group by.. having.. order by ..
+解析过程：
+from.. on.. join..where..group by...having .. select dintince .. order by
+
+索引优化案例
+
+1.
+alter table test03 add index idx_a1_a2_a3_a4 (a1, a2, a3, a4);
+explain select a1, a2, a3, a4 from test03 where a1 = 1 and a2 = 2 and a3 = 3 and a4 = 4; --执行的顺序和索引的顺序一致(推荐)
+explain select a1, a2, a3, a4 from test03 where a4 = 1 and a3 = 2 and a2 = 3 and a1 = 4; --虽然编写顺序不一致，但是mysql默认优化器优化了sql
+explain select a1, a2, a3, a4 from test03 where a1 = 1 and a2 = 2 and a4 = 4 order by a3;--以上sql用了a1, a2两个索引，回表查询a3
+explain select a1, a2, a3, a4 from test03 where a1 = 1 and a4 = 4 order by a2, a3;--sql用了a1,一个索引，回表查询a2, a3
+小结：如果(a, b, c, d)复合索引， 和使用的顺序全部一致则使用全部索引， 部分一致则使用部分，不跨列使用
+
+
+单表，多表优化案例
+
+单表---------------------------------------------------------
+create table book(
+bid int(4) PRIMARY key,
+name varchar(20) not null,
+authorid int(4) not null,
+publicid int(4) not null,
+typeid int(4) not null
+);
+
+insert into book VALUES(1, 'java', 1, 1, 2);
+insert into book VALUES(2, 'tc', 2, 1, 2);
+insert into book VALUES(3, 'wx', 3, 2, 1);
+insert into book VALUES(4, 'math', 4, 2, 3);
+
+select bid from book where typeid in (2, 3) and authorid=1;
+
+优化：加索引
+alter table book add index idx_bta(bid, typeid, authorid);
+
+根据SQL实际解析的顺序，调整索引的顺序：
+alter table book add index idx_tab (typeid, authorid, bid);
+
+再次优化（之前是index级别）思路， 因为范围in有时候会实现，所以更换索引typeid，authorid的顺序
+alter table book add index idx_atb (authorid, typeid, bid);
+
+SQL中把范围查询typeid放在后面
+explain select bid from book where authorid=1 and typeid in (2, 3) order by typeid desc;
+
+--原则：把where后面的条件放在前面，select的字段放在后面。条件in的字段放在=的后面
+
+
+两张表---------------------------------------------------------
+create table teacher2(
+tid int(4) primary key,
+cid int(4) not null
+);
+
+create table course2(
+cid int(4),
+cname varchar(20)
+);
+
+insert into teacher2 values(1,2);
+insert into teacher2 values(2,1);
+insert into teacher2 values(3,3);
+
+insert into course2 values(1, 'java');
+insert into course2 values(2, 'python');
+insert into course2 values(3, 'kotlin');
+
+select * from teacher2 t left outer join course2 c on t.cid=c.cid where c.cname = 'java';
+
+索引往哪张表里面加？ ---小表驱动大表
+		     ---索引建立在经常使用的字段上 （本题 t.cid使用频繁，因此给该字段加索引）
+		     ---左外链接给左表加索引，右外链接给右表加索引
+
+小表：10条数据
+大表：300条数据
+select ...where 小表.x = 大表.x (将数据量小的表放在外层遍历)
+
+alter table teacher2 add index index_teacher2_cid(cid);
+alter table course2 add index index_course2_cname(cname);
+
+Using join buffer: extra中的一个选项，作用 mysql引擎使用了连接缓存
+
+
+
+三张表---------------------------------------------------------
+
+三张表优化A B C
+a.小表驱动大表 b.索引建立在经常查询的字段 
+
+
+7.避免索引失效的一些原则
+ (1)复合索引	
+ a复合索引 不要跨列或无序使用
+ order by(a,b,c) 不要order by(a,c,b)
+ b复合索引，尽量使用全索引匹配
+ (a,b,c)
+
+ (2)不要再索引上进行任何操作 (计算，函数，类型转换) 否则索引失效
+ select ..where A.x = ..; 不要 select ..where A.x*3 = ..;
+ 对于复合索引，如果左边失效，右边同时失效
+
+ (3)复合索引不能使用不等于 !=, <>, is null,is not null。否则全部失效
+
+索引优化成功与否是一个概率的问题：
+
+1)---------索引优化，是一个大部分情况成功的事，但由于sql优化器的存在，结果不会百分之百被优化
+2)---------一般来说，范围查询(<， >, in) 之后的索引失效
+3)---------补救：尽量使用索引覆盖 (using index)
+索引(a,b,c)
+select a,b,c from xx.. where a=.. and b=..
+4)---------like尽量以常量开头，不要以 %开头，否则索引失效。如果必须使用 like '%x%'查询，可以用索引覆盖挽救一部分
+5)---------尽量不要使用类型转换(显示，隐式) 否则索引失效
+explain select * from teacher where tname = 'abc' ---有效
+explain select * from teacher where tname = 123 ---失效 程序底层将123转为 '123'
+6)---------尽量不要使用or 否则索引失效
+
+8.一些其他的优化方法
+(1)exist和in
+select ..from table where exist/in ( 子查询);
+如果主查询数据集大，使用in
+如果子查询数据集大，使用exists
+	
+exist语法：将主查询的结果，放到子查询结果中进行校验,如果有数据则校验成功。如果没数据返回空集
+select tname from teacher where exists (select * from teacher);---校验成功
+	
+select tname from teacher where exists (select * from teacher where tid = 9999);---空集
+
+(2)order by 优化
+using filesort 有两种算法：双路排序，单路排序
+mysql4.1版本之后，默认使用单路排序
+使用单路排序，如果数据量大，可以将数据库默认的buffer改成1024 set max_length_for_sort_data = 1024;
+
+提高order by查询的策略
+a. 选择使用单路，双路。调整buffer大小
+b. 避免select * ...
+c. 复合索引，不要跨列使用，避免using filesort
+d. 保证全部的排序字段 排序的一致性(都是升序或者降序)
+
+9.SQL排序 - 慢查询日志：MYSQL提供的一种日志记录，用于记录MYSQL中响应时间超过阀值的SQL语句 (long_query_time) 10秒
+	    慢查询日志默认是关闭的，建议开发时打开， 上线时关闭。
+检查是否开启了慢查询日志：show variables like '%slow_query_log%';
+
+临时开启 set global slow_query_log = 1; (0,关闭 1，开启)
+
+永久开启 /etc/my.cnf 中追加配置
+slow_query_log=1
+slow_query_log_file=/var/lib/mysql/localhost-slow.log
+
+慢查询阀值 show variables like '%long_query_time%';
+设置临时阀值 set global lone_query_time = 5; ---设置完成后，重新登录起效
+永久设置阀值 /etc/my.cnf中追加配置 long_query_time=5;
+
+vim /var/lib/mysql/localhost-slow.log
+
+获取记录数最多的3个SQL
+mysqldumpslow -s r -t 3 /var/lib/mysql/localhost-slow.log
+获取访问次数最多的3个SQL
+mysqldumpslow -s c -t 3 /var/lib/mysql/localhost-slow.log
+按时间排序，前10条包含left join查询语句的SQL
+mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/localhost-slow.log
