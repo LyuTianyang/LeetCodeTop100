@@ -21,7 +21,37 @@ public class MergeIntervals {
 	1 2 8  15
 	3 6 10 18
 	 */
-	public static int[][] merge(int[][] intervals) {
+	public static List<List<Integer>> merge(int[][] intervals) {
+		List<List<Integer>> tmps = new ArrayList<List<Integer>>();
+		if(intervals == null || intervals.length == 0) return tmps;
+		int n = intervals.length;
+		//放每个interval的起始点
+		int[] start = new int[n];
+		int[] end = new int[n];
+		for(int i=0; i<n; i++){
+			start[i] = intervals[i][0];
+			end[i] = intervals[i][intervals[i].length-1];
+		}
+		Arrays.sort(start);
+		Arrays.sort(end);
+		int i=0;
+		while(i<n){
+			int st = start[i];
+			//用第1个区间的终点和第2个区间的起点比较，比如用3和2比较
+			while(i < n-1 && start[i+1]<=end[i]){
+				i++;
+			}
+			int ed = end[i];
+			List<Integer> tmp = new ArrayList<Integer>();
+			tmp.add(st);
+			tmp.add(ed);
+			tmps.add(tmp);
+			i++;
+		}
+		return tmps;
+	}
+	
+	public static int[][] merge1(int[][] intervals) {
 		List<List<Integer>> tmps = new ArrayList<List<Integer>>();
 		if(intervals==null || intervals.length==0) return intervals;
 		//放每个interval的起始点
@@ -65,8 +95,9 @@ public class MergeIntervals {
 		intervals[1]=new int[]{2,6};
 		intervals[2]=new int[]{8,10};
 		intervals[3]=new int[]{15,18};
-		int[][] result = merge(intervals);
-		System.out.println(result);
+		List<List<Integer>> res = merge(intervals);
+		//int[][] res = merge1(intervals);
+		System.out.println(res);
 	}
 	
 }
