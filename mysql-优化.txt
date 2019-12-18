@@ -283,3 +283,105 @@ mysqldumpslow -s r -t 3 /var/lib/mysql/localhost-slow.log
 mysqldumpslow -s c -t 3 /var/lib/mysql/localhost-slow.log
 按时间排序，前10条包含left join查询语句的SQL
 mysqldumpslow -s t -t 10 -g "left join" /var/lib/mysql/localhost-slow.log
+
+10.分析海量数据
+create database testdata;
+
+create table dept(
+dno int(5) primary key DEFAULT 0,
+dname varchar(20) not null default '',
+loc varchar(30) default ''
+) engine=innodb default charset=utf8;
+
+create table emp(
+eid int(5) primary key,
+ename varchar(20) not null default '',
+job varchar(20) not null default '',
+deptno int(5) not null default 0
+)engine=innodb default charset=utf8;
+
+1.利用存储函数插入海量数据
+如果报错：his function has none of DETERMINISTIC, NO SQL, or READS SQL DATA in its declaration and binary logging is enabled (you *might* want to use the less safe log_bin_trust_function_creators variable)
+执行下面两个语句log_bin_trust_function_creators 把改成1
+show variables like '%log_bin_trust_function_creators%';
+set global log_bin_trust_function_creators = 1;
+
+delimiter $
+create function randstring(n int) returns varchar(255)
+	begin
+		declare all_str varchar(100) default 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		declare return_str varchar(255) default '';
+		declare i int default 0;
+		while i<n
+		do
+			set return_str = concat(return_str, substring(all_str, rand()*52, 1) );
+			set i = i+1;
+		end while;
+		return return_str;
+		
+	end $
+	
+create function ran_num() returns int(5)
+begin
+	declare i int default 0;
+	set i=floor( rand()*100);
+	return i;
+end $
+
+create procedure insert_emp( in eid_start int(10), in data_times int(10))
+begin
+	declare i int default 0;
+	set autocommit = 0;
+	repeat
+		insert into emp values(eid_start+i, randstring(5), 'other', ran_num()) ;
+		set i=i+1;
+		until i = data_times
+	end repeat;
+	commit;
+	
+end $
+
+create procedure insert_dept( in dno_start int(10), in data_times int(10))
+begin
+	declare i int default 0;
+	set autocommit = 0;
+	repeat
+		insert into dept values(dno_start+i, randstring(6), randstring(8)) ;
+		set i=i+1;
+		until i = data_times
+	end repeat;
+	commit;
+	
+end $
+
+把终止符改回改回 delimiter ;
+
+call insert_emp(1000, 800000);
+call insert_dept(10, 30);
+
+2.分析海量数据：profiles
+(1)
+show profiles;
+show variables like '%profiling%';
+set profiling = on;
+
+show profiles;记录打开之后的所有SQL语句
+
+(2)精确分析 sql诊断
+show profile all for query 上一步查询的query_Id
+show profile cpu, block io for query 上一步查询的query_Id
+
+(3)全局查询日志 记录开启之后 全部SQL语句
+
+show variables like '%general_log%';
+
+-------将所有SQL记录在表中
+set global general_log = 1; -------开启全局日志
+set global log_output='table'; -------将所有SQL记录在表中
+
+-------将所有SQL记录在文件中
+set global log_output='file';
+set global general_log = on;
+set global general_log_file = '/tmp/general.log';
+
+select * from mysql.general_log;
