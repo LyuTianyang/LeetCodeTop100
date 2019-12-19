@@ -32,7 +32,7 @@ public class SubSets1 {
 
 	public static void helper(int[] nums, int index, List<List<Integer>> res, List<Integer> curr) {
 		//如果currIdx超出nums的下标，跳出递归
-		if(index == nums.length){
+		if(index > nums.length-1){
 			res.add(new ArrayList<Integer>(curr));
 		}else{
 			//分支1：curr里面不加上nums[currIdx]
