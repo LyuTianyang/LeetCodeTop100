@@ -385,3 +385,59 @@ set global general_log = on;
 set global general_log_file = '/tmp/general.log';
 
 select * from mysql.general_log;
+
+11.锁机制 解决因资源共享 而造成的并发问题
+
+操作类型：
+读锁(共享锁)：对同一个数据，多个读操作可以同时进行，互不干扰。
+写锁(互斥锁)：如果当前写操作没有完毕，则无法进行其他的读操作，写操作。
+
+操作范围：
+表锁：一次性针对一张表整体加锁。如MyISAM存储引擎使用表锁，开销小，加锁快；无死锁；但锁的范围大，容易发生锁冲突，并发度低。
+行锁：一次性对一条数据加锁。如InnoDB引擎使用行锁，开销大，加锁慢；容易发生死锁；锁的范围较小，不容易发生锁冲突，并发度高。
+页锁
+
+示例：
+表锁：
+create table tablelock
+(
+id int primary key auto_increment,
+name varchar(20)
+)engine myisam;
+
+insert into tablelock(name) values('a1');
+insert into tablelock(name) values('a2');
+insert into tablelock(name) values('a3');
+insert into tablelock(name) values('a4');
+insert into tablelock(name) values('a5');
+加锁
+lock table 表名 read/write
+查看加锁的表
+show open tables;
+
+--------------------------加读锁
+---当前会话：
+lock table tablelock read;
+在当前会话可以读，但不可以写(增删改)
+select * from tablelock;
+如果给A表加了读锁，当前会话只能对A表进行读操作，其他都干不了。
+delete from tablelock where id = 1;
+当前会话对于其他表，读写都不可以。
+
+---其他会话：
+在其他会话可以读，
+select * from tablelock;
+如果给A表加了读锁，其他会话进行写操作会一直等待，直到锁释放
+delete from tablelock where id = 1;
+其他会话对于其他表，读可以，写可以。
+
+--------------------------加写锁
+---当前会话：
+lock table tablelock write;
+当前会话对于加了写锁的表可以进行任何操作(增删改查)，但不能操作其他表。
+---其他会话：
+对于加了写锁表进行操作，都会一直等待，直到锁释放。
+
+---释放锁
+unlock tables;
+
