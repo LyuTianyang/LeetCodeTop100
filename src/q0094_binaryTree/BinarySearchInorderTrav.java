@@ -15,6 +15,12 @@ class TreeNode {
 
 public class BinarySearchInorderTrav {
 	/**
+	前序遍历：根结点 ---> 左子树 ---> 右子树
+
+	中序遍历：左子树---> 根结点 ---> 右子树
+
+	后序遍历：左子树 ---> 右子树 ---> 根结点
+	
 	 给定一个二叉树，返回它的中序 遍历。
 	示例:
 	   1
@@ -44,10 +50,9 @@ public class BinarySearchInorderTrav {
 			helper(res, root.left);
 		}
 		res.add(root.val);
-		if(root.left != null){
+		if(root.right != null){
 			helper(res, root.right);
 		}
-		
 	}
 
 	public static List<Integer> inorderTraversal2(TreeNode root) {
@@ -66,4 +71,13 @@ public class BinarySearchInorderTrav {
 		}
 		return res;
     }
+	
+	public static void main(String[] args) {
+		TreeNode root = new TreeNode(1);
+		root.right = new TreeNode(2);
+		root.right.left = new TreeNode(3);
+		root.right.right = new TreeNode(4);
+		List<Integer> res = inorderTraversal(root);
+		System.out.println(res);
+	}
 }
