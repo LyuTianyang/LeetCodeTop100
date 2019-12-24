@@ -398,7 +398,7 @@ select * from mysql.general_log;
 页锁
 
 示例：
-表锁：
+1. 表锁：
 create table tablelock
 (
 id int primary key auto_increment,
@@ -441,3 +441,204 @@ lock table tablelock write;
 ---释放锁
 unlock tables;
 
+分析表锁定：
+查看哪些表加了锁：show open tables;
+分析表锁定的严重程度：show status like 'table%'; Table_locks_immediate 即刻能获取到的锁数 Table_locks_waited 需要等待的表锁数
+
+2. 行锁：
+create table linelock
+(
+id int primary key auto_increment,
+name varchar(20)
+)engine myisam;
+
+insert into linelock(name) values('1');
+insert into linelock(name) values('2');
+insert into linelock(name) values('3');
+insert into linelock(name) values('4');
+insert into linelock(name) values('5');
+
+行锁通过事务解锁（commit）
+
+12. 主从复制 (集群的一种实现方式)
+安装windows版本mysql
+先卸载mysql
+删除缓存文件夹 C:\Users\Admin\AppData\Local\mysql  C:\ProgramData\mysql
+删除注册表 regedit中所有mysql相关配置
+--重启计算机
+
+实现主从同步(主从复制) 
+
+核心：通过二进制日志同步 binary log
+1.master将改变的数据 记录在本地的binary log中(二进制日志事件)
+2.slave将master的binary log拷贝的自己的relay log(中继日志文件)
+3.中继日志事件，将数据读取到自己的数据库中
+
+mysql主从复制: 异步的，串行化，有延迟
+
+配置：
+windows(mysql: my.ini) master
+linux  (mysql: my.cnf) slave
+
+配置前，先关闭防火墙，允许远程访问
+
+grant all privileges on *.* to 'root'@'%' identified by 'root' with grant option;
+flush privileges;
+
+
+配置主机 windows(mysql: my.ini) master
+[mysqld]
+#id
+server-id=1
+#二进制日志文件(注意使用/)
+log-bin="E:/MySQL/MySQL Server 5.5/data/mysql-bin"
+#错误记录文件
+log-error="E:/MySQL/MySQL Server 5.5/data/mysql-error"
+#主从同步时，忽略的数据库
+binlog-ignore-db=mysql
+#(可选)主从同步时，同步哪些数据库
+binlog-do-db=test
+
+主数据库选择授权哪台计算机中的数据库，作为从数据库
+GRANT REPLICATION slave, reload, super ON *.* TO 'root'@'192.168.14.35' IDENTIFIED BY 'root';
+GRANT REPLICATION slave, reload, super ON *.* TO 'root'@'192.168.30.120' IDENTIFIED BY 'root';
+flush privileges;
+
+查看主数据库的状态(每次做主从同步前，需要观察主机状态的最新值)
+show master status;
+File: mysql-bin.000001 
+Position: 107
+
+
+
+
+配置从机 linux  (mysql: my.cnf) slave
+[mysqld]
+server-id=2
+log-bin=mysql-bin
+replicate-do-db=test
+
+从数据库选择授权哪台计算机中的数据库，作为主数据库
+CHANGE MASTER TO
+MASTER_HOST = '192.168.14.35',
+MASTER_USER = 'root',
+MASTER_PASSWORD = 'root',
+MASTER_PORT = 3306,
+master_log_file = 'mysql-bin.000001',
+master_log_pos = 107;
+如果报错 This operation cannot be performed with a running slave;
+先执行STOP SLAVE;
+
+slave开启主从同步
+START SALVE;
+show slave status \G
+
+观察下列参数，确保都是yes
+Slave_IO_Running
+Slave_SQL_Running
+如果不都是yes，看下方日志Last_IO_Error
+The slave I/O thread stops because master and slave have equal MySQL server ids
+使用 show variables like 'server_id'; 发现都是1 有可能是linux和windows安装的版本不同导致的bug
+解决bug，手动修改server_id：set global server_id = 2; 
+之后stop slave; start slave;
+
+在test数据库中创建表
+create table tb1(
+id int(4) primary key, 
+name varchar(20) not null);
+
+主主复制
+1. my.ini 增加下列配置
+
+#id
+server-id=1
+#二进制日志文件(注意使用/)
+log-bin="E:/MySQL/MySQL Server 5.5/data/mysql-bin"
+#错误记录文件
+log-error="E:/MySQL/MySQL Server 5.5/data/mysql-error"
+#主从同步时，忽略的数据库
+binlog-ignore-db=mysql
+#(可选)主从同步时，同步哪些数据库
+binlog-do-db=mastertest
+
+#主-主需加入的部分
+replicate-do-db = mastertest
+replicate-ignore-db=mysql,information_schema,test
+log-slave-updates
+sync_binlog=1
+auto_increment_offset=1
+auto_increment_increment=2
+
+grant replication slave on *.* to 'repl'@'192.168.30.120' identified by '123456';
+flush privileges;
+
+2. 查看主数据库的状态(每次做主从同步前，需要观察主机状态的最新值)
+show master status;
+
+3. 选择主数据库
+CHANGE MASTER TO
+MASTER_HOST = '192.168.30.120',
+MASTER_USER = 'root',
+MASTER_PASSWORD = 'root',
+MASTER_PORT = 3306,
+master_log_file = 'mysql-bin.000009',
+master_log_pos = 107;
+
+如果报错 This operation cannot be performed with a running slave;
+先执行STOP SLAVE;
+
+slave开启主从同步
+START SALVE;
+show slave status \G
+
+1.my.cnf 增加下列配置
+[mysqld]
+server-id=2
+replicate-do-db = mastertest
+#主-主需加入的部分
+auto_increment_offset=2
+auto_increment_increment=2
+log-slave-updates
+sync_binlog=1
+log_bin = /var/lib/mysql/mysql-binlog
+binlog-ignore-db=mysql
+binlog-ignore-db=information_schema
+binlog-ignore-db=test
+binlog_do_db = mastertest
+replicate-ignore-db=mysql,information_schema
+
+grant replication slave on *.* to 'repl'@'192.168.14.35' identified by '123456';
+flush privileges;
+
+2. 查看主数据库的状态(每次做主从同步前，需要观察主机状态的最新值)
+show master status;
+
+3. 从数据库选择授权哪台计算机中的数据库，作为主数据库
+
+CHANGE MASTER TO
+MASTER_HOST = '192.168.14.35',
+MASTER_USER = 'root',
+MASTER_PASSWORD = 'root',
+MASTER_PORT = 3306,
+master_log_file = 'mysql-bin.000001',
+master_log_pos = 655;
+
+如果报错 This operation cannot be performed with a running slave;
+先执行STOP SLAVE;
+
+slave开启主从同步
+START SALVE;
+show slave status \G
+
+观察下列参数，确保都是yes
+Slave_IO_Running
+Slave_SQL_Running
+如果不都是yes，看下方日志Last_IO_Error
+The slave I/O thread stops because master and slave have equal MySQL server ids
+使用 show variables like 'server_id'; 发现都是1 有可能是linux和windows安装的版本不同导致的bug
+解决bug，手动修改server_id：set global server_id = 2; 
+之后stop slave; start slave;
+
+create table tb(
+id int(4) primary key, 
+name varchar(20) not null);
