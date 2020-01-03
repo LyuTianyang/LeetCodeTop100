@@ -1,4 +1,9 @@
 package q0114_binaryTree;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+
 class TreeNode {
 	int val;
 	TreeNode left;
@@ -95,7 +100,7 @@ public class FlattenBinaryTreeToLinkedList {
 		  
 		  
 	 */
-	public void flatten(TreeNode root) {
+	public static void flatten1(TreeNode root) {
         while(root != null){
         	//左子树为null， 直接考虑下一个节点
         	if(root.left == null){
@@ -116,4 +121,34 @@ public class FlattenBinaryTreeToLinkedList {
         	}
         }
     }
+	
+	public static void flatten2(TreeNode root) {
+        Stack<TreeNode> stack = new Stack();
+        List<TreeNode> list = new ArrayList<>();
+        
+        while (root != null || !stack.isEmpty()) {
+            if (root != null) {
+                list.add(root);
+                stack.push(root);
+                root = root.left;
+            } else {
+                root = stack.pop().right;
+            }
+        }
+        for (int i = 0; i < list.size() - 1; i++) {
+            list.get(i).left = null;
+            list.get(i).right = list.get(i + 1);
+        }
+    }
+	
+	public static void main(String[] args) {
+		TreeNode root = new TreeNode(1);
+		root.left = new TreeNode(2);
+		root.left.left = new TreeNode(3);
+		root.left.right = new TreeNode(4);
+		root.right = new TreeNode(5);
+		root.right.right = new TreeNode(6);
+		flatten2(root);
+		System.out.println(root);
+	}
 }

@@ -35,7 +35,7 @@ public class SingleNumber {
     }
 	
 	public static void main(String[] args) {
-		int[] nums = new int[]{1,1,2,2,3,3,4,4,5};
+		int[] nums = new int[]{1,1,2,2,3,4,4,5,5};
 		int result = singleNumber(nums);
 		System.out.println(result);
 	}
