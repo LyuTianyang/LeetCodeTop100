@@ -3,15 +3,7 @@ package q0105_binaryTree;
 import java.util.HashMap;
 import java.util.Map;
 
-class TreeNode {
-	int val;
-	TreeNode left;
-	TreeNode right;
 
-	TreeNode(int x) {
-		val = x;
-	}
-}
 
 /**
  * 根据一棵树的前序遍历与中序遍历构造二叉树。
