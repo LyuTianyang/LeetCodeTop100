@@ -1,4 +1,4 @@
-package q0042;
+package q0042_hard;
 
 public class TrappingRainWater {
 

@@ -14,12 +14,7 @@ public class MinPathSum {
 	输出: 7
 	解释: 因为路径 1→3→1→1→1 的总和最小。
 	 */
-	/*
-	状态: [m][n]
-	init:
-	方程: min(up,left)+num
-	result 右下角的值 
-	*/
+	
 	public static int minPathSum(int[][] grid) {
 		if(grid==null) return 0;
         int m = grid.length;
@@ -43,7 +38,12 @@ public class MinPathSum {
         return dp[m-1][n-1];
     }
 	
-	
+	/*
+	状态: [m][n]
+	init:
+	方程: min(up,left)+num
+	result 右下角的值 
+	*/
 	public static void main(String[] args) {
 		int[][] grid = {{1,3,1},
 						{1,5,1},

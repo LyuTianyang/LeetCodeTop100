@@ -1,4 +1,4 @@
-package q0139;
+package q0139_dp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,6 +49,7 @@ public class WordBreak {
 		//result
 		return dp[n];
     }
+	
 	public static void main(String[] args) {
 		List<String> wordDict = new ArrayList<String>();
 		wordDict.add("apple");

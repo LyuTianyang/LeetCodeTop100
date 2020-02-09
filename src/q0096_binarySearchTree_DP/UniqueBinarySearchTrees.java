@@ -44,20 +44,19 @@ public class UniqueBinarySearchTrees {
 	 f(n) = f(0)*f(n-1) + f(1)*f(n-2)+ ... + f(n-2)*f(1) + f(n-1)*f(0)
 	 */
 	public static int numTrees(int n) {
-        int[] res = new int[n+1];
-        res[0] = 1;
+        int[] dp = new int[n+1];
+        dp[0] = 1;
         for(int i=1; i<=n; i++){
         	//j表示左子节点
         	for(int j=0; j<i; j++){
         		//i-j-1表示右子节点，1是根节点 
         		//f(3) = f(0)*f(3-0-1) + f(1)*f(3-1-1) + f(2)*f(3-2-1)
         		//f(3) = f(0)*f(2) + f(1)*f(1) + f(2)*f(0)
-        		res[i] += res[j]*res[i-j-1];
+        		dp[i] += dp[j]*dp[i-j-1];
         	}
         }
-        return res[n];
+        return dp[n];
     }
-	
 	
 	public static void main(String[] args) {
 		int res = numTrees(5);

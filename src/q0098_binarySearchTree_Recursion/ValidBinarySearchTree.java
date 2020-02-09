@@ -66,4 +66,5 @@ public class ValidBinarySearchTree {
 		//左侧节点的最大值是根节点，右侧节点的最小值是根节点
 		return helper(root.left, min, root.val) && helper(root.right, root.val, max);
 	}
+	
 }

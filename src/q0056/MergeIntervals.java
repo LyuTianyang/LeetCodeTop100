@@ -38,7 +38,7 @@ public class MergeIntervals {
 		while(i<n){
 			int st = start[i];
 			//用第1个区间的终点和第2个区间的起点比较，比如用3和2比较
-			while(i < n-1 && start[i+1]<=end[i]){
+			while(i < n-1 && end[i]>=start[i+1]){
 				i++;
 			}
 			int ed = end[i];

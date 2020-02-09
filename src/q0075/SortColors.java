@@ -15,34 +15,35 @@ public class SortColors {
 	先从前面找到第一个不是0的下标，再从后面找到第一个不是2的下标
 	 */
 	public static void sortColors(int[] nums) {
-        if(nums == null || nums.length<=1) return;
-        int colFirst = 0;
-        while(colFirst<nums.length && nums[colFirst]==0){
-        	colFirst++;
-        }
-        int colLast = nums.length - 1;
-        while(colLast>=0 && nums[colLast]==2){
-        	colLast--;
-        }
-        //start from first non-0 index
-        int index = colFirst;
-        while(index <= colLast){
-        	if(nums[index]==1){
-        		index++;
-        	}else if(nums[index]==0){
-        		switchColor(nums, colFirst, index);
-        		colFirst++;
-        		index++;
-        	}else if(nums[index]==2){
-        		switchColor(nums, colLast, index);
-        		colLast--;
-        	}
-        }
-    }
-
-	public static void switchColor(int[] nums, int colFirst, int index) {
-		int tmp = nums[colFirst];
-		nums[colFirst] = nums[index];
+		if(nums == null || nums.length == 1) return;
+		int n = nums.length;
+		//find first non-0 index from start
+		int colFirst = 0;
+		while(colFirst < n && nums[colFirst] == 0){
+			colFirst++;
+		}
+		//find first non-2 index from end
+		int colLast = n-1;
+		while(colLast >= 0 && nums[colLast] == 2){
+			colLast --;
+		}
+		int index = colFirst;
+		while(index <= colLast){
+			if(nums[index] == 1){
+				index++;
+			}else if(nums[index] == 0){
+				switchColor(nums, colFirst, index);
+				colFirst++;
+				index++;
+			}else if(nums[index] == 2){
+				switchColor(nums, colLast, index);
+				colLast--;
+			}
+		}
+	}
+	public static void switchColor(int[] nums, int color, int index){
+		int tmp = nums[color];
+		nums[color] = nums[index];
 		nums[index] = tmp;
 	}
 	

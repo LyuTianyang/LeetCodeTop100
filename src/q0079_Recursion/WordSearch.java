@@ -37,6 +37,7 @@ public class WordSearch {
 		if(row < 0 || row>= board.length || col<0 || col>= board[0].length) return false;
 		//这个点被找过了
 		if(used[row][col] == true || board[row][col] != word[idx]) return false;
+		//开始上下左右的搜索
 		used[row][col] = true;
 		//up
 		boolean exist = helper(board, used, word, idx+1, col, row+1);

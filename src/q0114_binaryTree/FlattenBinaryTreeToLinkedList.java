@@ -148,7 +148,7 @@ public class FlattenBinaryTreeToLinkedList {
 		root.left.right = new TreeNode(4);
 		root.right = new TreeNode(5);
 		root.right.right = new TreeNode(6);
-		flatten2(root);
+		flatten1(root);
 		System.out.println(root);
 	}
 }
