@@ -42,7 +42,6 @@ public class LowestCommonAncestorOfBinaryTree {
             return right;
         }
 	}
-	
 	public static void main(String[] args) {
 		TreeNode root = new TreeNode(3);
 		root.left = new TreeNode(5);

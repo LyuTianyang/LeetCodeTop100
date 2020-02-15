@@ -1,5 +1,7 @@
 package q0075;
 
+import java.util.Arrays;
+
 public class SortColors {
 	/**
 	给定一个包含红色、白色和蓝色，一共 n 个元素的数组，原地对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
@@ -50,8 +52,6 @@ public class SortColors {
 	public static void main(String[] args) {
 		int[] nums = {0,0,1,2,0,1,0,2,2};
 		sortColors(nums);
-		for(int num: nums){
-			System.out.println(num);
-		}
+		System.out.println(Arrays.toString(nums));
 	}
 }

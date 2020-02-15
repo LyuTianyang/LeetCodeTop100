@@ -27,9 +27,9 @@ public class ReverseList {
 	public static ListNode reverseList(ListNode head) {
         if(head == null || head.next == null) return head;
         ListNode pre = null;
-        while(head != null){
+        while(head != null){ 
         	ListNode tmp = head.next;
-        	head.next = pre;
+         	head.next = pre;
         	pre = head;
         	head = tmp;
         }

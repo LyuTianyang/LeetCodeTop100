@@ -18,15 +18,18 @@ public class KthLargeElementInArray {
 	//quick select(从快速排序截取)
 	public static int findKthLargest(int[] nums, int k) {
         if(nums == null || nums.length == 0) return 0;
+        //k换算成下标
+        k = k-1;
+        if(k<0 || k>nums.length-1) return -1;
         int left = 0;
         int right = nums.length-1;
         while(true){
         	int pos = partition(nums, left, right);
-        	if(pos+1==k){
+        	if(pos==k){
         		return nums[pos];
-        	}else if(pos+1>k){
-        		right = pos - 1;
-        	}else{
+        	}else if(pos>k){
+        		right = pos-1;
+        	}else if(pos<k){
         		left = pos+1;
         	}
         }
@@ -68,7 +71,7 @@ public class KthLargeElementInArray {
 	
 	public static void main(String[] args) {
 		int[] nums = {3,2,1,5,6,4};
-		int result = findKthLargest(nums, 3);
+		int result = findKthLargest(nums, 2);
 		System.out.println(result);
 	}
 	

@@ -27,7 +27,7 @@ public class CourseSchedule {
 	你可以假定输入的先决条件中没有重复的边。
 	
 	0 - 1 - 2
-	       /
+	 \      /
 	  3 - 4
 	  入度 = 0
 	  0:0
@@ -36,6 +36,8 @@ public class CourseSchedule {
 	  3:0
 	  4:1
 	 */
+	
+	//BFS
 	public static boolean canFinish(int numCourses, int[][] prerequisites) {
         int[] indegree = new int[numCourses];
         int res = numCourses;
@@ -49,7 +51,7 @@ public class CourseSchedule {
         	}
         }
         while(!queue.isEmpty()){
-        	Integer pre = queue.poll();
+        	int pre = queue.poll();
         	numCourses--;
         	for(int[] req: prerequisites){
         		if(req[1] != pre) continue;

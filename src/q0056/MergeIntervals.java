@@ -30,7 +30,7 @@ public class MergeIntervals {
 		int[] end = new int[n];
 		for(int i=0; i<n; i++){
 			start[i] = intervals[i][0];
-			end[i] = intervals[i][intervals[i].length-1];
+			end[i] = intervals[i][1];
 		}
 		Arrays.sort(start);
 		Arrays.sort(end);

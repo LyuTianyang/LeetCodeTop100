@@ -1,4 +1,4 @@
-package q0160;
+package q0160_ListNode;
 
 class ListNode{
     int val;

@@ -1,5 +1,7 @@
 package q0238;
 
+import java.util.Arrays;
+
 public class ProductOfArrayExceptSelf {
 	/**
 	给定长度为 n 的整数数组 nums，其中 n > 1，返回输出数组 output ，其中 output[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积。
@@ -33,9 +35,7 @@ public class ProductOfArrayExceptSelf {
 	public static void main(String[] args) {
 		int[] nums = {1,2,3,4};
 		int[] res = productExceptSelf1(nums);
-		for(int r: res){
-			System.out.println(r);
-		}
+		System.out.println(Arrays.toString(res));
 				 
 	}
 	
