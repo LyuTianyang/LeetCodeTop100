@@ -17,23 +17,23 @@ public class ShortestUnsortedContinuousSubarray {
 	 */
 	public static int findUnsortedSubarray1(int[] nums) {
 		Stack<Integer> stack = new Stack<Integer>();
-		int l = nums.length;
-		int r = 0;
+		int left = nums.length;
+		int right = 0;
 		for(int i=0; i<nums.length; i++){
 			while(!stack.isEmpty() && nums[stack.peek()]>nums[i]){
-				l = Math.min(l, stack.pop());
+				left = Math.min(left, stack.pop());
 			}
 			stack.push(i);
 		}
 		stack.clear();
 		for(int i=nums.length-1; i>=0; i--){
 			while(!stack.isEmpty() && nums[stack.peek()]<nums[i]){
-				r = Math.max(r, stack.pop());
+				right = Math.max(right, stack.pop());
 			}
 			stack.push(i);
 		}
-		if(r-l>0){
-			return r-l+1;
+		if(right-left>0){
+			return right-left+1;
 		}else{
 			return 0;
 		}
@@ -54,7 +54,7 @@ public class ShortestUnsortedContinuousSubarray {
 	
 	public static void main(String[] args) {
 		int[] nums = {2, 6, 4, 8, 10, 9, 15};
-		int res = findUnsortedSubarray2(nums);
+		int res = findUnsortedSubarray1(nums);
 		System.out.println(res);
 	}
 }

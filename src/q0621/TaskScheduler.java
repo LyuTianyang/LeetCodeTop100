@@ -31,7 +31,7 @@ public class TaskScheduler {
         while(nums[25]>0){
         	int i = 0;
         	while(i<=n){
-        		if(nums[25] == 0){
+        		if(nums[25] <= 0){
         			break;
         		}
         		if(i<26 && nums[25-i]>0){
@@ -46,7 +46,7 @@ public class TaskScheduler {
     }
 	
 	public static void main(String[] args) {
-		char[] tasks = {'A','B','C','A','A','D','E','A','A','A'};
+		char[] tasks = {'A','B','C','A','A','D','E','A','A','B'};
 		int n = 2;
 		int res = leastInterval(tasks, n);
 		System.out.println(res);

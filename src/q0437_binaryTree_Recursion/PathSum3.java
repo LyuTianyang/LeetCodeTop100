@@ -47,9 +47,14 @@ public class PathSum3 {
 		if(root.val == sum){
 			res += 1;
 		}
-		res += paths(root.left, sum-root.val);
-		res += paths(root.right, sum-root.val);
-		
+//		res += paths(root.left, sum-root.val);
+//		res += paths(root.right, sum-root.val);
+		if(root.left != null){
+			res += paths(root.left, sum-root.val);
+		}
+		if(root.right != null){
+			res += paths(root.right, sum-root.val);
+		}
 		return res;
 	}
 }

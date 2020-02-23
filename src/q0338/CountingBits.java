@@ -1,5 +1,7 @@
 package q0338;
 
+import java.util.Arrays;
+
 public class CountingBits {
 	/**
 	给定一个非负整数 num。对于 0 ≤ i ≤ num 范围中的每个数字 i ，计算其二进制数中的 1 的数目并将它们作为数组返回。
@@ -50,8 +52,6 @@ public class CountingBits {
 	
 	public static void main(String[] args) {
 		int[] ans = countBits2(5);
-		for(int i : ans){
-			System.out.println(i);
-		}
+		System.out.println(Arrays.toString(ans));
 	}
 }

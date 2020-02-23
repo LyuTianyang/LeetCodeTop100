@@ -14,6 +14,7 @@ public class SubArraySumEqualsK {
 	 */
 	
 	public static int subarraySum1(int[] nums, int k) {
+		if(nums == null || nums.length == 0) return 0;
         int count = 0;
         for(int start = 0; start < nums.length; start++){
         	int sum = 0;
@@ -26,6 +27,7 @@ public class SubArraySumEqualsK {
     }
 	
 	public static int subarraySum2(int[] nums, int k) {
+		if(nums == null || nums.length == 0) return 0;
         int count = 0, sum = 0;
         Map <Integer, Integer> map = new HashMap <Integer, Integer> ();
         map.put(0, 1);
@@ -38,6 +40,7 @@ public class SubArraySumEqualsK {
         }
         return count;
     }
+
 	
 	public static void main(String[] args) {
 		int[] nums = {1,2,3,4,5,6,7};

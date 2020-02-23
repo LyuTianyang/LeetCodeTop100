@@ -42,7 +42,6 @@ public class PartitionEqualSubsetSum {
         }
         return dp[target];
     }
-	
 	public static void main(String[] args) {
 		int[] nums = {1, 5, 11, 5};
 		boolean res = canPartition(nums);

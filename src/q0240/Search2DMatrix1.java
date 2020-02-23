@@ -72,7 +72,7 @@ public class Search2DMatrix1 {
 		        		  {10, 11, 16, 20},
 		        		  {23, 30, 34, 50}
 		        		};
-		boolean res = searchMatrix1(matrix, 20);
+		boolean res = searchMatrix(matrix, 20);
 		System.out.println(res);
 	}
 }

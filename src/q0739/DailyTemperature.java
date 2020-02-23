@@ -1,5 +1,6 @@
 package q0739;
 
+import java.util.Arrays;
 import java.util.Stack;
 
 public class DailyTemperature {
@@ -10,6 +11,7 @@ public class DailyTemperature {
 	
 	提示：气温 列表长度的范围是 [1, 30000]。每个气温的值的均为华氏度，都是在 [30, 100] 范围内的整数。
 
+	类似 621题
 	 */
 	public static int[] dailyTemperatures1(int[] T) {
         if(T == null || T.length == 0) return T;
@@ -17,7 +19,7 @@ public class DailyTemperature {
         Stack<Integer> stack = new Stack<Integer>();
         for(int i=T.length-1; i>=0; --i){
         	while(!stack.isEmpty() && T[i]>=T[stack.peek()]){
-        		stack.pop();
+         		stack.pop();
         	}
         	if(stack.isEmpty()){
         		ans[i] = 0;
@@ -72,9 +74,7 @@ public class DailyTemperature {
 	public static void main(String[] args) {
 		int[] T = {73, 74, 75, 71, 69, 72, 76, 73};
 		int[] ans = dailyTemperatures1(T);
-		for(int i: ans){
-			System.out.println(i);
-		}
+		System.out.println(Arrays.toString(ans));
 	}
 	
 	/*

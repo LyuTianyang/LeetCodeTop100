@@ -62,6 +62,8 @@ public class FindTheDuplicateNumber {
     }
 	
 	public static void main(String[] args) {
-		
+		int[] nums = new int[]{3,1,2,4,3};
+		int res = findDuplicate1(nums);
+		System.out.println(res);
 	}
 }	

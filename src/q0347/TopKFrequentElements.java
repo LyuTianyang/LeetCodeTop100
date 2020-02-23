@@ -12,7 +12,7 @@ public class TopKFrequentElements {
 
 	示例 1:
 	
-	输入: nums = [1,1,1,2,2,3], k = 2
+	输入: nums = [1,1,1,2,2,3,3,3,4], k = 2
 	输出: [1,2]
 	示例 2:
 	
@@ -87,8 +87,8 @@ public class TopKFrequentElements {
     }
 	
 	public static void main(String[] args) {
-		int[] nums = {1,1,1,2,2,3};
-		int k = 2;
+		int[] nums = {1,1,1,2,2,3,3,3,4,5};
+		int k = 3;
 		List<Integer> res = topKFrequent1(nums, k);
 		System.out.println(res);
 	}

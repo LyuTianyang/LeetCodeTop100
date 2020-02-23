@@ -1,4 +1,4 @@
-package q0538;
+package q0538_BinarySearchTree;
 
 import java.util.Stack;
 
@@ -26,8 +26,8 @@ public class ConvertBST {
 	            /   \
 	          20     13
 	 */
-	private int sum = 0;
-	public TreeNode convertBST(TreeNode root) {
+	private static int sum = 0;
+	public static TreeNode convertBST(TreeNode root) {
 		if(root == null) return root;
         if(root != null){
         	convertBST(root.right);
@@ -59,4 +59,13 @@ public class ConvertBST {
         }
         return root;
     }
+	
+	public static void main(String[] args) {
+		TreeNode node = new TreeNode(5);
+		node.left = new TreeNode(2);
+		node.right = new TreeNode(13);
+		TreeNode root = convertBST(node);
+		System.out.println(root.left.val);
+		
+	}
 }

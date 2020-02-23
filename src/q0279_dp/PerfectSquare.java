@@ -14,9 +14,6 @@ public class PerfectSquare {
 	输入: n = 13
 	输出: 2
 	解释: 13 = 4 + 9.
-	
-	动态转移方程为：dp[i] = MIN(dp[i], dp[i - j * j] + 1)，i表示当前数字，j*j表示平方数
-
 	 */
 	public static int numSquares(int n) {
         int[] dp = new int[n+1]; // 默认初始化值都为0
@@ -28,9 +25,9 @@ public class PerfectSquare {
         }
         return dp[n];
     }
-	
+	// 动态转移方程为：dp[i] = MIN(dp[i], dp[i - j * j] + 1)，i表示当前数字，j*j表示平方数
 	public static void main(String[] args) {
-		int res = numSquares(12);
+		int res = numSquares(13);
 		System.out.println(res);
 	}
 }
