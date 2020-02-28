@@ -43,6 +43,7 @@ public class SortColors {
 			}
 		}
 	}
+	
 	public static void switchColor(int[] nums, int color, int index){
 		int tmp = nums[color];
 		nums[color] = nums[index];

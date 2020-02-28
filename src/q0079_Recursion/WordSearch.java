@@ -22,7 +22,7 @@ public class WordSearch {
         int idx = 0;
         for(int row=0; row<board.length; row++){
         	for(int col=0; col<board[0].length; col++){
-        		if(helper(board, used, word.toCharArray(), idx, col, row)){
+        		if(helper(board, used, word.toCharArray(), idx, row, col)){
         			return true;
         		}
         	}
@@ -30,7 +30,7 @@ public class WordSearch {
         return false;
     }
 	
-	public static boolean helper(char[][] board, boolean[][] used, char[] word, int idx, int col, int row){
+	public static boolean helper(char[][] board, boolean[][] used, char[] word, int idx, int row, int col){
 		//word里面的元素都被找到了，true
 		if(idx == word.length) return true;
 		//row或col出界， false
@@ -39,17 +39,17 @@ public class WordSearch {
 		if(used[row][col] == true || board[row][col] != word[idx]) return false;
 		//开始上下左右的搜索
 		used[row][col] = true;
-		//up
-		boolean exist = helper(board, used, word, idx+1, col, row+1);
-		if(exist) return true;
-		//down
-		exist = helper(board, used, word, idx+1, col, row-1);
-		if(exist) return true;
 		//right
-		exist = helper(board, used, word, idx+1, col+1, row);
+		boolean exist = helper(board, used, word, idx+1, row+1, col);
 		if(exist) return true;
 		//left
-		exist = helper(board, used, word, idx+1, col-1, row);
+		exist = helper(board, used, word, idx+1, row-1, col);
+		if(exist) return true;
+		//up
+		exist = helper(board, used, word, idx+1, row, col+1);
+		if(exist) return true;
+		//down
+		exist = helper(board, used, word, idx+1, row, col-1);
 		if(exist) return true;
 		used[row][col] = false;
 		return false;

@@ -95,8 +95,12 @@ public class MergeIntervals {
 		intervals[1]=new int[]{2,6};
 		intervals[2]=new int[]{8,10};
 		intervals[3]=new int[]{15,18};
+		
+		/*int[][] res = merge1(intervals);
+		for(int i=0; i<res.length; i++){
+			System.out.println(Arrays.toString(res[i]));
+		}*/
 		List<List<Integer>> res = merge(intervals);
-		//int[][] res = merge1(intervals);
 		System.out.println(res);
 	}
 	
