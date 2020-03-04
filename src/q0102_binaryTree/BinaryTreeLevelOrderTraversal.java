@@ -38,9 +38,9 @@ public class BinaryTreeLevelOrderTraversal {
 		Queue<TreeNode> queue = new LinkedList<TreeNode>();
 		queue.offer(root);//把根节点放入队列之中
 		while(!queue.isEmpty()){
+			List<Integer> list = new ArrayList<Integer>();
 			//当前层级有几个节点
 			int size = queue.size();
-			List<Integer> list = new ArrayList<Integer>();
 			for(int i=0; i<size; i++){
 				TreeNode cur = queue.poll();
 				if(cur.left != null) queue.offer(cur.left);

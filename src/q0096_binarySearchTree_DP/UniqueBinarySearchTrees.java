@@ -44,6 +44,7 @@ public class UniqueBinarySearchTrees {
 	 f(n) = f(0)*f(n-1) + f(1)*f(n-2)+ ... + f(n-2)*f(1) + f(n-1)*f(0)
 	 */
 	public static int numTrees(int n) {
+		if(n <= 1) return n;
         int[] dp = new int[n+1];
         dp[0] = 1;
         for(int i=1; i<=n; i++){
@@ -59,7 +60,7 @@ public class UniqueBinarySearchTrees {
     }
 	
 	public static void main(String[] args) {
-		int res = numTrees(5);
+		int res = numTrees(3);
 		System.out.println(res);
 	}
 }
